@@ -1,0 +1,5 @@
+# Applied when sdkconfig is regenerated (e.g. after deleting it).
+# One DHCP lease per soft-AP client (AP_MAX_CLIENTS in network_config.h).
+CONFIG_LWIP_DHCPS_MAX_STATION_NUM=10
+# HTTP server (up to 7 client sockets + 3 internal) plus the database client.
+CONFIG_LWIP_MAX_SOCKETS=16
