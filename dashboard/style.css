@@ -1,0 +1,390 @@
+/* =========================================================
+   PLATEGUARD DASHBOARD — STYLESHEET
+   =========================================================
+   Purpose:
+   - Style the main PlateGuard monitoring dashboard.
+   - Display server and camera status at the top.
+   - Place Recent Activity (60%) beside Security Alerts (40%).
+   - Adapt the layout for tablets and phones.
+
+   Note: Gate Status and Admin Panel have been removed
+   from the dashboard, so neither needs CSS here.
+   ========================================================= */
+
+
+/* =========================================================
+   1. GLOBAL PAGE SETTINGS
+   ========================================================= */
+
+/* Include padding and borders in each element's width. */
+* {
+    box-sizing: border-box;
+}
+
+/* Default font, text color, and light gray page background. */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f4f6f8;
+    color: #222;
+}
+
+
+/* =========================================================
+   2. PAGE HEADER
+   ========================================================= */
+
+/* Dark header across the top of the dashboard. */
+header {
+    background: #1f2937;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Main PlateGuard title. */
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+/* Subtitle below the title. */
+header p {
+    margin: 5px 0 0;
+}
+
+
+/* =========================================================
+   3. MAIN CONTENT CONTAINER
+   ========================================================= */
+
+/* Keep dashboard content centered on wide monitors. */
+main {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+
+/* =========================================================
+   4. SYSTEM STATUS BAR
+   =========================================================
+   Contains two status boxes:
+   - Server Status
+   - Camera Status
+   ========================================================= */
+
+/* Arrange both status boxes in one row. */
+.status-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+/* Shared appearance for each status box. */
+.status-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove extra space above each status heading. */
+.status-box h3 {
+    margin-top: 0;
+}
+
+/* Green label for an online system. */
+.online {
+    color: green;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   5. SHARED DASHBOARD CARDS
+   ========================================================= */
+
+/* White panels used for detections and both tables. */
+.card {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* =========================================================
+   6. LATEST VEHICLE DETECTION
+   ========================================================= */
+
+/* Center the detected plate and authorization indicator. */
+.latest {
+    text-align: center;
+}
+
+/* License plate styled as a bordered plate-shaped label. */
+.plate {
+    display: inline-block;
+    background: white;
+    border: 3px solid #222;
+    border-radius: 6px;
+    padding: 10px 30px;
+    margin: 15px;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+
+/* =========================================================
+   7. AUTHORIZATION INDICATORS
+   ========================================================= */
+
+/* Shared formatting for authorized and unauthorized badges. */
+.authorized,
+.unauthorized {
+    color: white;
+    font-weight: bold;
+    padding: 12px 20px;
+    margin: 10px auto;
+    border-radius: 6px;
+    max-width: 300px;
+    text-align: center;
+}
+
+/* Green badge for an authorized license plate. */
+.authorized {
+    background: #28a745;
+}
+
+/* Red badge for an unauthorized license plate. */
+.unauthorized {
+    background: #dc3545;
+}
+
+
+/* =========================================================
+   8. SIDE-BY-SIDE ACTIVITY AND ALERT PANELS
+   =========================================================
+   Left panel:  Recent Activity  — 3 of 5 grid units (60%)
+   Right panel: Security Alerts — 2 of 5 grid units (40%)
+   ========================================================= */
+
+/* Create two columns with 20px spacing between them. */
+.tables-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+/* Allow cards to shrink within the grid without overflow. */
+.tables-layout .card {
+    min-width: 0;
+    margin-bottom: 25px;
+}
+
+/* Align the headings at the top of both table cards. */
+.tables-layout h2 {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   9. TABLE FORMATTING
+   ========================================================= */
+
+/* Make each table fill its card's available width. */
+.tables-layout table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+/* Style both table headers and table data cells. */
+.tables-layout th,
+.tables-layout td {
+    padding: 10px 7px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    overflow-wrap: anywhere;
+}
+
+/* Light gray background for table header rows. */
+.tables-layout th {
+    background: #f1f1f1;
+}
+
+/* Green text identifies authorized entries in Recent Activity. */
+.green-text {
+    color: green;
+    font-weight: bold;
+}
+
+/* Red text identifies unauthorized entries and alert details. */
+.red-text {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   10. OPTIONAL ALERT BANNER STYLES
+   =========================================================
+   These styles are retained for any alert banner that may
+   be added later. The Security Alerts table uses the
+   table formatting above instead.
+   ========================================================= */
+
+/* Neutral/inactive alert banner. */
+.alert {
+    margin-top: 15px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    background: #f1f1f1;
+    border: 2px solid #ccc;
+    color: #555;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Red-highlighted active alert banner. */
+.active-alert {
+    background: #ffe5e5;
+    border: 2px solid #d32f2f;
+    color: #d32f2f;
+    font-weight: bold;
+    font-size: 17px;
+    box-shadow: 0 0 8px rgba(211, 47, 47, 0.25);
+}
+
+
+/* =========================================================
+   11. RESPONSIVE LAYOUT — TABLETS / SMALL LAPTOPS
+   =========================================================
+   At widths of 1000px or less, stack the two table cards
+   vertically so their contents have more room.
+   ========================================================= */
+
+@media (max-width: 1000px) {
+    .tables-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* =========================================================
+   12. RESPONSIVE LAYOUT — PHONES
+   =========================================================
+   Reduce spacing and allow horizontal table scrolling
+   when the screen is too narrow for all table columns.
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    /* Reduce the outer margins and side padding. */
+    main {
+        padding: 0 12px;
+        margin: 18px auto;
+    }
+
+    /* Bring server and camera status boxes closer together. */
+    .status-bar {
+        gap: 10px;
+    }
+
+    /* Reduce padding inside cards on smaller screens. */
+    .card {
+        padding: 15px;
+    }
+
+    /* Scroll a table horizontally rather than clipping it. */
+    .tables-layout .card {
+        overflow-x: auto;
+    }
+
+    /* Maintain enough width to read the table columns. */
+    .tables-layout table {
+        min-width: 480px;
+    }
+
+    /* Make the license plate fit more comfortably on phones. */
+    .plate {
+        font-size: 23px;
+        padding: 10px 15px;
+    }
+}
+
+
+/* =========================================================
+   13. TWO-COLUMN DASHBOARD LAYOUT
+   =========================================================
+   LEFT: Latest Vehicle Detection above Recent Activity.
+   RIGHT: Security Alerts spans the combined height of both.
+   ========================================================= */
+
+/* Divide the dashboard into a 58% left and 42% right area. */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: stretch;
+}
+
+/* Stack detection and activity cards in the left column. */
+.dashboard-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+/* Allow activity to occupy the remaining left-column height. */
+.dashboard-left .activity-card {
+    flex: 1;
+}
+
+/* Stretch the alerts card to the full height of the right column. */
+.dashboard-right {
+    display: flex;
+    min-width: 0;
+}
+
+.dashboard-right .alerts-card {
+    flex: 1;
+}
+
+/* Remove card margins: grid gaps handle spacing here. */
+.dashboard-grid .card {
+    margin-bottom: 0;
+}
+
+/* Prevent wide tables from pushing the grid off screen. */
+.dashboard-grid .card {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+/* Keep alert reasons readable when space is limited. */
+.alerts-card td {
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   14. RESPONSIVE TWO-COLUMN LAYOUT
+   =========================================================
+   On narrower screens, stack all three cards vertically.
+   ========================================================= */
+@media (max-width: 1050px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-right {
+        display: block;
+    }
+}

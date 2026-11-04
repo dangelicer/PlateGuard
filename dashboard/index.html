@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>
+   PlateGuard Dashboard
+  </title>
+  <!-- Connect the webpage to our CSS file -->
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"/>
+ </head>
+ <body>
+  <!-- ==================================================
+         PAGE HEADER
+         ================================================== -->
+  <header>
+   <h1>
+    PlateGuard
+   </h1>
+   <p>
+    Parking Access Control System
+   </p>
+  </header>
+  <main>
+   <!-- ==================================================
+             SYSTEM STATUS BAR
+             ================================================== -->
+   <section class="status-bar">
+    <div class="status-box">
+     <h3>
+      Server Status
+     </h3>
+     <p class="online">
+      ● Online
+     </p>
+    </div>
+    <div class="status-box">
+     <h3>
+      Camera Status
+     </h3>
+     <p class="online">
+      ● Online
+     </p>
+    </div>
+   </section>
+   <!-- ==================================================
+             LATEST VEHICLE DETECTION
+             ================================================== -->
+   <!-- ==================================================
+             RECENT ACTIVITY
+             ================================================== -->
+   <!-- ==================================================
+             SECURITY ALERTS
+             ================================================== -->
+   <!-- ==================================================
+             ADMIN PANEL
+             ================================================== -->
+   <div class="dashboard-grid">
+    <div class="dashboard-left">
+     <section class="card latest">
+      <h2>
+       Latest Vehicle Detection
+      </h2>
+      <!-- Current detected plate -->
+      <div class="plate" id="detected-plate">
+       ABC1234
+      </div>
+      <!-- Authorization indicator -->
+      <div class="authorized" id="authorization-status">
+       AUTHORIZED
+      </div>
+      <!-- Gate action -->
+     </section>
+     <section class="card activity-card">
+      <h2>
+       Recent Activity
+      </h2>
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Plate
+         </th>
+         <th>
+          Status
+         </th>
+         <th>
+          Attempts
+         </th>
+         <th>
+          Time
+         </th>
+        </tr>
+       </thead>
+       <tbody id="activity-table">
+        <tr>
+         <td colspan="4">
+          No vehicle activity yet
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </section>
+    </div>
+    <div class="dashboard-right">
+     <section class="card alerts-card">
+      <h2>
+       Security Alerts
+      </h2>
+      <!--
+                Alert records are loaded from the
+                SQLite alerts table through /api/alerts.
+            -->
+      <table>
+       <thead>
+        <tr>
+         <th>
+          Plate
+         </th>
+         <th>
+          Attempt
+         </th>
+         <th>
+          Reason
+         </th>
+         <th>
+          Time
+         </th>
+        </tr>
+       </thead>
+       <tbody id="alert-table">
+        <tr>
+         <td colspan="4">
+          No alerts recorded
+         </td>
+        </tr>
+       </tbody>
+      </table>
+     </section>
+    </div>
+   </div>
+  </main>
+  <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+  <script>
+   // =================================================
+        // UPDATE CURRENT VEHICLE STATUS
+        // =================================================
+
+        function updateStatus() {
+
+
+            // Ask Flask for the current vehicle.
+            fetch('/api/status')
+
+
+                // Convert JSON response into
+                // JavaScript data.
+                .then(response => response.json())
+
+
+                .then(data => {
+
+
+                    // -------------------------------------
+                    // LICENSE PLATE
+                    // -------------------------------------
+
+                    document.getElementById(
+                        "detected-plate"
+                    ).textContent = data.plate;
+
+
+
+                    // -------------------------------------
+                    // AUTHORIZATION INDICATOR
+                    // -------------------------------------
+
+                    const statusIndicator =
+                        document.getElementById(
+                            "authorization-status"
+                        );
+
+
+                    statusIndicator.textContent =
+                        data.status;
+
+
+                    // Select green or red styling.
+                    if (data.authorized === true) {
+
+
+                        statusIndicator.className =
+                            "authorized";
+
+
+                    } else {
+
+
+                        statusIndicator.className =
+                            "unauthorized";
+
+
+                    }
+
+
+
+
+
+                })
+
+
+                .catch(error => {
+
+
+                    console.error(
+                        "Status API Error:",
+                        error
+                    );
+
+
+                });
+
+        }
+
+
+
+        // =================================================
+        // UPDATE RECENT ACTIVITY TABLE
+        // =================================================
+
+        function updateActivity() {
+
+
+            // Ask Flask for recent detections.
+            fetch('/api/activity')
+
+
+                .then(response => response.json())
+
+
+                .then(activity => {
+
+
+                    // Find the activity table.
+                    const table =
+                        document.getElementById(
+                            "activity-table"
+                        );
+
+
+                    // Remove the old table rows.
+                    table.innerHTML = "";
+
+
+                    // If there are no detections,
+                    // display a message.
+                    if (activity.length === 0) {
+
+
+                        table.innerHTML = `
+
+                            <tr>
+
+                                <td colspan="4">
+                                    No vehicle activity yet
+                                </td>
+
+                            </tr>
+
+                        `;
+
+
+                        return;
+
+                    }
+
+
+
+                    // Go through every detection
+                    // returned by Flask.
+                    activity.forEach(record => {
+
+
+                        // Create a new table row.
+                        const row =
+                            document.createElement("tr");
+
+
+                        // Choose text styling based
+                        // on authorization status.
+                        let statusClass;
+
+
+                        if (record.status === "AUTHORIZED") {
+
+
+                            statusClass =
+                                "green-text";
+
+
+                        } else {
+
+
+                            statusClass =
+                                "red-text";
+
+
+                        }
+
+
+                        // Build the table row.
+                        row.innerHTML = `
+
+                            <td>
+                                ${record.plate}
+                            </td>
+
+                            <td class="${statusClass}">
+                                ${record.status}
+                            </td>
+
+                            <td>
+                                ${record.attempts}
+                            </td>
+
+                            <td>
+                                ${record.timestamp}
+                            </td>
+
+                        `;
+
+
+                        // Add the row to the table.
+                        table.appendChild(row);
+
+
+                    });
+
+
+                })
+
+
+                .catch(error => {
+
+
+                    console.error(
+                        "Activity API Error:",
+                        error
+                    );
+
+
+                });
+
+        }
+
+
+
+        // =================================================
+        // UPDATE SECURITY ALERTS
+        // =================================================
+
+        function updateAlerts() {
+
+
+            // Ask Flask for stored security alerts.
+            fetch('/api/alerts')
+
+
+                .then(response => response.json())
+
+
+                .then(alerts => {
+
+
+                    // Find the alert table.
+                    const table =
+                        document.getElementById(
+                            "alert-table"
+                        );
+
+
+                    // Remove the old alert rows.
+                    table.innerHTML = "";
+
+
+                    // If no alerts exist,
+                    // display a message.
+                    if (alerts.length === 0) {
+
+
+                        table.innerHTML = `
+
+                            <tr>
+
+                                <td colspan="4">
+                                    No alerts recorded
+                                </td>
+
+                            </tr>
+
+                        `;
+
+
+                        return;
+
+                    }
+
+
+
+                    // Go through every alert returned
+                    // from the SQLite alerts table.
+                    alerts.forEach(alert => {
+
+
+                        // Create a new table row.
+                        const row =
+                            document.createElement("tr");
+
+
+                        // Build the alert row.
+                        row.innerHTML = `
+
+                            <td class="red-text">
+                                ${alert.plate}
+                            </td>
+
+                            <td class="red-text">
+                                ${alert.attempts}
+                            </td>
+
+                            <td class="red-text">
+                                ${alert.reason}
+                            </td>
+
+                            <td>
+                                ${alert.timestamp}
+                            </td>
+
+                        `;
+
+
+                        // Add the alert to the table.
+                        table.appendChild(row);
+
+
+                    });
+
+
+                })
+
+
+                .catch(error => {
+
+
+                    console.error(
+                        "Alert API Error:",
+                        error
+                    );
+
+
+                });
+
+        }
+
+
+
+        // =================================================
+        // CLIENT POLLING
+        // =================================================
+
+        // Update all dashboard information.
+        function updateDashboard() {
+
+
+            updateStatus();
+
+            updateActivity();
+
+            updateAlerts();
+
+
+        }
+
+
+
+        // Poll Flask every 10 seconds.
+        setInterval(
+            updateDashboard,
+            10000
+        );
+
+
+        // Update immediately when the page loads.
+        updateDashboard();
+  </script>
+ </body>
+</html>
