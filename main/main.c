@@ -9,6 +9,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "includes/servo_gate.h"
 
 #if !TEST_MODE
 static const char *TAG = "MAIN";
@@ -27,6 +28,8 @@ void app_main(void)
     ESP_ERROR_CHECK(ret);
 
     client_registry_init(); // must exist before Wi-Fi events start arriving
+    // Initialize the SG90 gate before processing detections.
+    ESP_ERROR_CHECK(servo_gate_init());
 
     esp_err_t wifi_ret = wifi_init();
     if (wifi_ret != ESP_OK) {
@@ -41,4 +44,12 @@ void app_main(void)
     xTaskCreate(http_test_task, "http_test", 8192, NULL, 5, NULL);
 #endif
 #endif
+}
+
+
+esp_err_t gate_err = servo_gate_trigger();
+
+if (gate_err != ESP_OK) {
+    ESP_LOGW(TAG, "Unable to queue gate request: %s",
+             esp_err_to_name(gate_err));
 }

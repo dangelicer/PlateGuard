@@ -7,6 +7,7 @@
 #include "esp_timer.h"
 #include "includes/detection_pipeline.h"
 #include "includes/db_client.h"
+#include "includes/servo_gate.h"
 
 #define DETECTION_QUEUE_LEN     8
 
@@ -35,6 +36,28 @@ static void detection_task(void *arg)
     detection_record_t rec;
     while (1) {
         xQueueReceive(s_queue, &rec, portMAX_DELAY);
+        /*
+        * PLATEGUARD SERVO INTEGRATION
+        *
+        * Trigger the gate immediately after a new detection
+        * is removed from the detection queue.
+        *
+        * Every detection requests an opening cycle.
+        *
+        * Authorization status does not affect gate operation.
+        *
+        * The servo runs in a separate FreeRTOS task,
+        * so this function does not wait for gate movement.
+        */
+
+        esp_err_t gate_err = servo_gate_trigger();
+
+        if (gate_err != ESP_OK) {
+            ESP_LOGW(TAG, "Unable to queue gate request: %s",
+                    esp_err_to_name(gate_err));
+        }
+
+        // Continue Daniel's existing database check.
 
         rec.result = check_with_db(&rec.detection);
         if (db_result_is_authorized(rec.result)) {
