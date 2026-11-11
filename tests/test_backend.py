@@ -152,6 +152,60 @@ class PlatesModuleTests(TempDbTestCase):
             self.assertEqual(len(plates.list_plates(c)), 2)
 
 
+class DashboardTests(TempDbTestCase):
+    def check(self, plate):
+        self.client.post("/api/check_plate", json={"plate": plate})
+
+    def test_page_and_static_served_under_prefix(self):
+        r = self.client.get("/dashboard/")
+        self.assertEqual(r.status_code, 200)
+        page = r.get_data(as_text=True)
+        self.assertIn("PlateGuard", page)
+        # relative URLs only, so they resolve under /dashboard/ through the ESP
+        self.assertIn('href="static/style.css"', page)
+        self.assertNotIn("fetch('/", page)
+        self.assertEqual(self.client.get("/dashboard/static/style.css").status_code, 200)
+
+    def test_redirects_are_relative(self):
+        for path in ("/", "/dashboard"):
+            with self.subTest(path=path):
+                r = self.client.get(path)
+                self.assertIn(r.status_code, (301, 302, 308))
+                self.assertEqual(r.headers["Location"], "/dashboard/")
+
+    def test_status_empty_db(self):
+        body = self.client.get("/dashboard/api/status").get_json()
+        self.assertIs(body["authorized"], False)
+        self.assertEqual(self.client.get("/dashboard/api/activity").get_json(), [])
+        self.assertEqual(self.client.get("/dashboard/api/alerts").get_json(), [])
+
+    def test_status_activity_alerts(self):
+        for _ in range(3):
+            self.check("BAD111")
+        self.check("GOOD22")
+        with self.conn() as c:
+            plates.set_status(c, "GOOD22", "AUTHORIZED")
+
+        status = self.client.get("/dashboard/api/status").get_json()
+        self.assertEqual((status["plate"], status["authorized"]), ("GOOD22", True))
+
+        activity = self.client.get("/dashboard/api/activity").get_json()
+        self.assertEqual({a["plate"] for a in activity}, {"GOOD22", "BAD111"})
+        self.assertRegex(activity[0]["timestamp"], r"^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$")
+
+        alerts = self.client.get("/dashboard/api/alerts").get_json()
+        self.assertEqual([a["plate"] for a in alerts], ["BAD111"])
+        self.assertEqual(alerts[0]["attempts"], 3)
+        self.assertIn("reason", alerts[0])
+
+    def test_dashboard_does_not_count_lookups(self):
+        self.check("TXA1234")
+        self.client.get("/dashboard/api/status")
+        self.client.get("/dashboard/api/activity")
+        with self.conn() as c:
+            self.assertEqual(plates.get_plate(c, "TXA1234").attempts, 1)
+
+
 class ManageCliTests(TempDbTestCase):
     def run_cli(self, *argv):
         out, err = io.StringIO(), io.StringIO()
@@ -176,6 +230,34 @@ class ManageCliTests(TempDbTestCase):
 
         code, out, _ = self.run_cli("list", "--status", "UNAUTHORIZED")
         self.assertIn("(no plates)", out)
+
+    def test_increment(self):
+        self.client.post("/api/check_plate", json={"plate": "TXA1234"})  # attempts 1
+
+        code, out, _ = self.run_cli("increment", "TXA1234")
+        self.assertEqual(code, 0)
+        code, out, _ = self.run_cli("increment", "TXA1234", "--by", "3")
+        self.assertEqual(code, 0)
+        with self.conn() as c:
+            p = plates.get_plate(c, "TXA1234")
+        self.assertEqual((p.attempts, p.status), (5, PlateStatus.UNAUTHORIZED))
+
+    def test_increment_unknown_plate(self):
+        code, _, err = self.run_cli("increment", "NOPE")
+        self.assertEqual(code, 1)
+        self.assertIn("--create", err)
+
+        code, _, _ = self.run_cli("increment", "NOPE", "--by", "2", "--create")
+        self.assertEqual(code, 0)
+        with self.conn() as c:
+            p = plates.get_plate(c, "NOPE")
+        self.assertEqual((p.attempts, p.status), (2, PlateStatus.UNAUTHORIZED))
+
+    def test_increment_rejects_non_positive(self):
+        for by in ("0", "-1", "abc"):
+            with self.subTest(by=by), redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit):
+                    self.run_cli("increment", "TXA1234", "--by", by)
 
     def test_set_status_unknown_plate(self):
         code, _, err = self.run_cli("set-status", "NOPE", "AUTHORIZED")

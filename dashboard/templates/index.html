@@ -4,8 +4,11 @@
   <title>
    PlateGuard Dashboard
   </title>
-  <!-- Connect the webpage to our CSS file -->
-  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet"/>
+  <!-- Connect the webpage to our CSS file.
+       Keep every URL in this page relative (no leading "/"): the page is served
+       at /dashboard/ through the ESP32, so "static/style.css" and "api/status"
+       become /dashboard/static/style.css and /dashboard/api/status. -->
+  <link href="static/style.css" rel="stylesheet"/>
  </head>
  <body>
   <!-- ==================================================
@@ -150,7 +153,7 @@
 
 
             // Ask Flask for the current vehicle.
-            fetch('/api/status')
+            fetch('api/status')
 
 
                 // Convert JSON response into
@@ -232,7 +235,7 @@
 
 
             // Ask Flask for recent detections.
-            fetch('/api/activity')
+            fetch('api/activity')
 
 
                 .then(response => response.json())
@@ -363,7 +366,7 @@
 
 
             // Ask Flask for stored security alerts.
-            fetch('/api/alerts')
+            fetch('api/alerts')
 
 
                 .then(response => response.json())

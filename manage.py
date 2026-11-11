@@ -3,6 +3,9 @@
     python manage.py set-status TXA1234 AUTHORIZED
     python manage.py set-status TXA1234 UNAUTHORIZED
     python manage.py set-status NEW123 AUTHORIZED --create   # pre-authorize an unseen plate
+    python manage.py increment TXA1234                       # attempts + 1
+    python manage.py increment TXA1234 --by 5                # attempts + 5
+    python manage.py increment NEW123 --create               # add an unseen plate with attempts 1
     python manage.py show TXA1234
     python manage.py list
     python manage.py list --status UNAUTHORIZED
@@ -40,6 +43,23 @@ def cmd_set_status(conn, args):
     return 0
 
 
+def cmd_increment(conn, args):
+    plate = plates.increment_attempts(conn, args.plate, args.by, create=args.create)
+    if plate is None:
+        print(f"Plate {args.plate!r} is not in the database. "
+              f"Use --create to add it.", file=sys.stderr)
+        return 1
+    print_table([plate])
+    return 0
+
+
+def positive_int(text):
+    value = int(text)
+    if value < 1:
+        raise argparse.ArgumentTypeError("must be 1 or more")
+    return value
+
+
 def cmd_show(conn, args):
     plate = plates.get_plate(conn, args.plate)
     if plate is None:
@@ -63,6 +83,13 @@ def main(argv=None):
     p.add_argument("status", type=str.upper, choices=STATUS_CHOICES)
     p.add_argument("--create", action="store_true", help="add the plate if it isn't in the database")
     p.set_defaults(func=cmd_set_status)
+
+    p = sub.add_parser("increment", help="add to a plate's attempts")
+    p.add_argument("plate")
+    p.add_argument("--by", type=positive_int, default=1, help="how many attempts to add (default 1)")
+    p.add_argument("--create", action="store_true",
+                   help=f"add the plate (status {plates.DEFAULT_STATUS.value}) if it isn't in the database")
+    p.set_defaults(func=cmd_increment)
 
     p = sub.add_parser("show", help="show one plate")
     p.add_argument("plate")

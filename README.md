@@ -36,6 +36,9 @@ Run from this folder (safe while the server is running):
 python manage.py set-status TXA1234 AUTHORIZED
 python manage.py set-status TXA1234 UNAUTHORIZED
 python manage.py set-status NEW123 AUTHORIZED --create   # plate not seen yet
+python manage.py increment TXA1234                        # attempts + 1
+python manage.py increment TXA1234 --by 5                 # attempts + 5
+python manage.py increment NEW123 --create                # plate not seen yet
 python manage.py show TXA1234
 python manage.py list
 python manage.py list --status UNAUTHORIZED
@@ -68,16 +71,36 @@ plateguard/
   config.py           settings (override with PLATEGUARD_<NAME> env vars)
   db.py               SQLite connections and transactions
   plates.py           plates table and all operations on it (no Flask)
-  api.py              /api routes
+  api.py              /api routes (used by the ESP)
+  web.py              /dashboard routes (website)
+dashboard/            website templates/ and static/ files
 tests/                python -m unittest -v
 ```
 
+## Dashboard website
+
+The dashboard (files in `dashboard/templates/` and `dashboard/static/`) is
+served by this app under `/dashboard/`. Laptops on the ESP's Wi-Fi open
+**http://192.168.4.1/**: the ESP redirects to `/dashboard/`, forwards each
+request to this server and streams the response back 1 KB at a time (see
+`web_proxy.c` in the ESP code). On this laptop it is also at
+http://localhost:5000/dashboard/.
+
+| Route                     | Data                                                   |
+|---------------------------|--------------------------------------------------------|
+| `GET /dashboard/`         | the page                                               |
+| `GET /dashboard/api/status`   | most recently seen plate                           |
+| `GET /dashboard/api/activity` | last `DASHBOARD_ROWS` (5) plates seen              |
+| `GET /dashboard/api/alerts`   | UNAUTHORIZED plates with `attempts >= ALERT_THRESHOLD` (3) |
+
+These routes only read the database. Keep every URL in the page relative
+(`static/style.css`, `api/status`, no leading `/`) so it resolves under
+`/dashboard/` through the ESP. `dashboard/app.py` is the original standalone
+prototype with simulated data; it is not used by `run.py`.
+
 ### Adding features
 
-- **Website** (pages loaded by other laptops on the ESP's Wi-Fi): add
-  `plateguard/web.py` with a Blueprint, plus `plateguard/templates/` and
-  `plateguard/static/`, and register it in `create_app()`. Pages can call
-  functions in `plates.py` directly; JavaScript can use new JSON routes in
-  `api.py`.
+- **More pages / JSON for the website**: add routes to `plateguard/web.py`
+  (they appear under `/dashboard/` and are reachable through the ESP).
 - **New table**: give the module a `SCHEMA` string like `plates.py` and add it
   to the `schemas` list in `create_app()`.

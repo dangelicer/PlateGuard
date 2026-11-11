@@ -18,3 +18,8 @@ class Config:
 
     # Matches the ESP's DETECTION_PLATE_LEN (32) minus the terminating '\0'
     PLATE_MAX_LEN = 31
+
+    # Dashboard (/dashboard/): an UNAUTHORIZED plate seen this many times is an alert
+    ALERT_THRESHOLD = 3
+    # Rows shown in the dashboard's Recent Activity and Security Alerts tables
+    DASHBOARD_ROWS = 5

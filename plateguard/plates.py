@@ -112,9 +112,47 @@ def set_status(conn, plate, status, create=False):
     return _from_row(row)
 
 
+def increment_attempts(conn, plate, by=1, create=False):
+    """Adds `by` (>= 1) to a plate's attempts without counting it as an ESP
+    lookup, e.g. to test the dashboard's alerts. Returns the updated Plate, or
+    None if the plate isn't in the database and create is False. With
+    create=True a missing plate is added with attempts = by and the default
+    status."""
+    if not isinstance(by, int) or by < 1:
+        raise ValueError("by must be a positive integer")
+    now = _now()
+    with transaction(conn):
+        cur = conn.execute(
+            "UPDATE plates SET attempts = attempts + ?, timestamp = ? WHERE plate = ?",
+            (by, now, plate),
+        )
+        if cur.rowcount == 0:
+            if not create:
+                return None
+            conn.execute(
+                "INSERT INTO plates (plate, attempts, timestamp, status) VALUES (?, ?, ?, ?)",
+                (plate, by, now, DEFAULT_STATUS.value),
+            )
+        row = _select(conn, plate)
+    return _from_row(row)
+
+
 def get_plate(conn, plate):
     row = _select(conn, plate)
     return _from_row(row) if row is not None else None
+
+
+def recent_plates(conn, limit, status=None, min_attempts=0):
+    """Up to `limit` plates, most recently changed first, optionally only those
+    with the given status and at least `min_attempts` lookups."""
+    sql = "SELECT plate, attempts, timestamp, status FROM plates WHERE attempts >= ?"
+    params = [min_attempts]
+    if status is not None:
+        sql += " AND status = ?"
+        params.append(PlateStatus(status).value)
+    sql += " ORDER BY timestamp DESC, rowid DESC LIMIT ?"
+    params.append(limit)
+    return [_from_row(r) for r in conn.execute(sql, params)]
 
 
 def list_plates(conn, status=None):
