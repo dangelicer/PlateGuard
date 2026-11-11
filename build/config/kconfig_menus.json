@@ -41745,7 +41745,7 @@
                     }
                 ],
                 "depends_on": null,
-                "id": "component-config-cjson-C:-Users-danie-OneDrive-Desktop-PlateGuard-plateguard_code-managed_components-espressif__cjson-Kconfig-1",
+                "id": "component-config-cjson-C:-Users-isr18-OneDrive-Documents-GitHub_Projects-PlateGuard-managed_components-espressif__cjson-Kconfig-1",
                 "title": "cJSON",
                 "type": "menu"
             },

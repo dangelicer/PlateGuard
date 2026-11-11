@@ -18,8 +18,8 @@ end
 
 # Load bootloader symbols
 set confirm off
-    add-symbol-file C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader/bootloader.elf
+    add-symbol-file C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader/bootloader.elf
 set confirm on
 
 # Load application symbols
-file C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/plateguard_code.elf
+file C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/PlateGuard.elf

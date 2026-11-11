@@ -40,6 +40,6 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader/esp-idf/esp_security/install_local_manifest.txt"
+  file(WRITE "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader/esp-idf/esp_security/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

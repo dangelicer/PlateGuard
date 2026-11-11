@@ -1,4 +1,4 @@
-"-specs=C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader/specs/picolibc.specs"
+"-specs=C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader/specs/picolibc.specs"
 -Wno-frame-address
 -mlongcalls
 -fno-builtin-memcpy

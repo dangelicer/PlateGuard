@@ -22,4 +22,4 @@ set confirm off
 set confirm on
 
 # Load application symbols
-file C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader/bootloader.elf
+file C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader/bootloader.elf

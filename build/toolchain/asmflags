@@ -3,4 +3,4 @@
 -fno-builtin-memcpy
 -fno-builtin-memset
 -fno-builtin-bzero
-"-specs=C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/specs/picolibc.specs"
+"-specs=C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/specs/picolibc.specs"

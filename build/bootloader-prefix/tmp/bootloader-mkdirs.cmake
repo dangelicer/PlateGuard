@@ -10,18 +10,18 @@ if(NOT EXISTS "C:/esp/v6.1/esp-idf/components/bootloader/subproject")
   file(MAKE_DIRECTORY "C:/esp/v6.1/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader"
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix"
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/tmp"
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/src/bootloader-stamp"
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/src"
-  "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/tmp"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/src"
+  "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

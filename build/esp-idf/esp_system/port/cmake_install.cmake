@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/plateguard_code")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/PlateGuard")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -39,12 +39,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/esp-idf/esp_system/port/soc/esp32/cmake_install.cmake")
+  include("C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/esp-idf/esp_system/port/soc/esp32/cmake_install.cmake")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/esp-idf/esp_system/port/install_local_manifest.txt"
+  file(WRITE "C:/Users/isr18/OneDrive/Documents/GitHub_Projects/PlateGuard/build/esp-idf/esp_system/port/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

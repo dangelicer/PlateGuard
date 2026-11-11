@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.16)
 
 if("${CONFIG}" STREQUAL "" OR "${CONFIG}" STREQUAL "")
   file(REMOVE_RECURSE
+  "PlateGuard.bin"
+  "PlateGuard.map"
   "bootloader\\bootloader.bin"
   "bootloader\\bootloader.elf"
   "bootloader\\bootloader.map"
@@ -16,8 +18,6 @@ if("${CONFIG}" STREQUAL "" OR "${CONFIG}" STREQUAL "")
   "flasher_args.json.in"
   "ldgen_libraries"
   "ldgen_libraries.in"
-  "plateguard_code.bin"
-  "plateguard_code.map"
   "project_elf_src_esp32.c"
   "x509_crt_bundle.S"
   )
