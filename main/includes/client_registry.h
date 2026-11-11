@@ -6,8 +6,8 @@
 #include <stdint.h>
 #include "esp_netif_ip_addr.h"
 
-// What a connected station is used for. See network_config.h for how roles
-// are assigned.
+// What a connected station is used for. Roles are fixed per MAC address by the
+// known-devices list in network_config.h; everything else is UNKNOWN.
 typedef enum {
     CLIENT_ROLE_UNKNOWN = 0,
     CLIENT_ROLE_DETECTOR,    // Raspberry Pi: sends plate detections to us
@@ -18,7 +18,8 @@ typedef enum {
 typedef struct {
     uint8_t mac[6];
     esp_ip4_addr_t ip;       // 0.0.0.0 until DHCP assigns one
-    char hostname[32];       // from DHCP option 12, may be empty
+    char hostname[32];       // from DHCP option 12, may be empty (informational only)
+    const char *name;        // known-device name from network_config.h, NULL if unknown
     client_role_t role;
 } client_info_t;
 
@@ -30,14 +31,9 @@ void client_registry_on_connect(const uint8_t mac[6]);
 void client_registry_on_ip_assigned(const uint8_t mac[6], esp_ip4_addr_t ip, const char *hostname);
 void client_registry_on_disconnect(const uint8_t mac[6]);
 
-// Copies the first connected client with this role and an IP into *out.
-// Returns false if there is none.
+// Copies the first connected client with this role and an IP into *out
+// (e.g. to find the database server's current IP). Returns false if there is none.
 bool client_registry_find_role(client_role_t role, client_info_t *out);
-
-// Gives the client with this IP a role it has proven by its behaviour (e.g.
-// it sent us a detection). Only upgrades UNKNOWN/VIEWER clients, so a
-// hostname-assigned role is never overwritten.
-void client_registry_set_role_by_ip(esp_ip4_addr_t ip, client_role_t role);
 
 // Copies up to max connected clients into out. Returns how many were copied.
 size_t client_registry_snapshot(client_info_t *out, size_t max);

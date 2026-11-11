@@ -9,6 +9,8 @@
 //                          -> 202 {"status":"queued","plate":"..."}
 //   GET  /api/status       -> 200 {"uptime_ms":..,"clients":[..],"recent_detections":[..]}
 // Errors are JSON too: {"status":"error","error":"..."}.
+// The dashboard website (/, /dashboard/...) is added by web_proxy_start().
+// URIs may use wildcards, e.g. "/dashboard/*".
 esp_err_t http_server_start(void);
 
 // Adds another route (e.g. the webpage) after http_server_start().

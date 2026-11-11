@@ -1,5 +1,4 @@
 #include <string.h>
-#include <strings.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "esp_log.h"
@@ -15,27 +14,27 @@ typedef struct {
 } slot_t;
 
 typedef struct {
-    const char *hostname_prefix;
+    const char *name;
+    uint8_t mac[6];
     client_role_t role;
-} role_rule_t;
+} known_device_t;
 
-static const role_rule_t s_role_rules[] = {
-    { DB_SERVER_HOSTNAME, CLIENT_ROLE_DB_SERVER },
-    { DETECTOR_HOSTNAME,  CLIENT_ROLE_DETECTOR },
+static const known_device_t s_known_devices[] = {
+    { DETECTOR_NAME,  DETECTOR_MAC,  CLIENT_ROLE_DETECTOR },
+    { DB_SERVER_NAME, DB_SERVER_MAC, CLIENT_ROLE_DB_SERVER },
 };
 
 static slot_t s_slots[AP_MAX_CLIENTS];
 static SemaphoreHandle_t s_lock;
 
-static client_role_t role_from_hostname(const char *hostname)
+static const known_device_t *find_known_device(const uint8_t mac[6])
 {
-    for (size_t i = 0; i < sizeof(s_role_rules) / sizeof(s_role_rules[0]); i++) {
-        const char *prefix = s_role_rules[i].hostname_prefix;
-        if (strncasecmp(hostname, prefix, strlen(prefix)) == 0) {
-            return s_role_rules[i].role;
+    for (size_t i = 0; i < sizeof(s_known_devices) / sizeof(s_known_devices[0]); i++) {
+        if (memcmp(s_known_devices[i].mac, mac, 6) == 0) {
+            return &s_known_devices[i];
         }
     }
-    return CLIENT_ROLE_UNKNOWN;
+    return NULL;
 }
 
 // caller must hold s_lock
@@ -49,7 +48,8 @@ static slot_t *find_by_mac(const uint8_t mac[6])
     return NULL;
 }
 
-// caller must hold s_lock; returns the existing slot for this MAC or a fresh one
+// caller must hold s_lock; returns the existing slot for this MAC or a fresh
+// one, with its role and name filled in from the known-devices list
 static slot_t *find_or_alloc(const uint8_t mac[6])
 {
     slot_t *slot = find_by_mac(mac);
@@ -61,6 +61,11 @@ static slot_t *find_or_alloc(const uint8_t mac[6])
             memset(&s_slots[i], 0, sizeof(s_slots[i]));
             s_slots[i].in_use = true;
             memcpy(s_slots[i].info.mac, mac, 6);
+            const known_device_t *known = find_known_device(mac);
+            if (known != NULL) {
+                s_slots[i].info.role = known->role;
+                s_slots[i].info.name = known->name;
+            }
             return &s_slots[i];
         }
     }
@@ -75,17 +80,23 @@ void client_registry_init(void)
 
 void client_registry_on_connect(const uint8_t mac[6])
 {
+    client_info_t copy;
+    bool ok = false;
+
     xSemaphoreTake(s_lock, portMAX_DELAY);
     slot_t *slot = find_or_alloc(mac);
     if (slot != NULL) {
         slot->info.ip.addr = 0;   // a reconnecting station gets a fresh DHCP lease
+        copy = slot->info;
+        ok = true;
     }
     xSemaphoreGive(s_lock);
 
-    if (slot == NULL) {
+    if (!ok) {
         ESP_LOGE(TAG, MACSTR " joined but the registry is full", MAC2STR(mac));
     } else {
-        ESP_LOGI(TAG, MACSTR " joined", MAC2STR(mac));
+        ESP_LOGI(TAG, MACSTR " joined -> %s (role: %s)", MAC2STR(mac),
+                 copy.name ? copy.name : "unknown device", client_role_name(copy.role));
     }
 }
 
@@ -100,15 +111,15 @@ void client_registry_on_ip_assigned(const uint8_t mac[6], esp_ip4_addr_t ip, con
         slot->info.ip = ip;
         strncpy(slot->info.hostname, hostname ? hostname : "", sizeof(slot->info.hostname) - 1);
         slot->info.hostname[sizeof(slot->info.hostname) - 1] = '\0';
-        slot->info.role = role_from_hostname(slot->info.hostname);
         copy = slot->info;
         ok = true;
     }
     xSemaphoreGive(s_lock);
 
     if (ok) {
-        ESP_LOGI(TAG, MACSTR " \"%s\" got IP " IPSTR " -> role: %s",
-                 MAC2STR(mac), copy.hostname, IP2STR(&copy.ip), client_role_name(copy.role));
+        ESP_LOGI(TAG, MACSTR " (%s, hostname \"%s\") got IP " IPSTR " -> role: %s",
+                 MAC2STR(mac), copy.name ? copy.name : "unknown device", copy.hostname,
+                 IP2STR(&copy.ip), client_role_name(copy.role));
     }
 }
 
@@ -140,29 +151,6 @@ bool client_registry_find_role(client_role_t role, client_info_t *out)
     }
     xSemaphoreGive(s_lock);
     return found;
-}
-
-void client_registry_set_role_by_ip(esp_ip4_addr_t ip, client_role_t role)
-{
-    if (ip.addr == 0) {
-        return;
-    }
-
-    bool changed = false;
-    xSemaphoreTake(s_lock, portMAX_DELAY);
-    for (size_t i = 0; i < AP_MAX_CLIENTS; i++) {
-        client_info_t *c = &s_slots[i].info;
-        if (s_slots[i].in_use && c->ip.addr == ip.addr &&
-            (c->role == CLIENT_ROLE_UNKNOWN || c->role == CLIENT_ROLE_VIEWER) && c->role != role) {
-            c->role = role;
-            changed = true;
-        }
-    }
-    xSemaphoreGive(s_lock);
-
-    if (changed) {
-        ESP_LOGI(TAG, IPSTR " is now role: %s", IP2STR(&ip), client_role_name(role));
-    }
 }
 
 size_t client_registry_snapshot(client_info_t *out, size_t max)

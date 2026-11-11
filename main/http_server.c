@@ -97,7 +97,6 @@ static esp_err_t detections_post_handler(httpd_req_t *req)
     }
 
     det.source_ip = peer_ip(req);
-    client_registry_set_role_by_ip(det.source_ip, CLIENT_ROLE_DETECTOR);
 
     if (detection_pipeline_submit(&det) != ESP_OK) {
         return send_error(req, "503 Service Unavailable", "detection queue full, retry later");
@@ -132,6 +131,7 @@ esp_err_t http_server_start(void)
     cfg.server_port = ESP_HTTP_PORT;
     cfg.stack_size = 8192;        // handlers keep the request body and status snapshot on the stack
     cfg.lru_purge_enable = true;  // with many viewers, drop the idlest connection instead of refusing
+    cfg.uri_match_fn = httpd_uri_match_wildcard;  // lets web_proxy.c register "/dashboard/*"
 
     esp_err_t err = httpd_start(&s_server, &cfg);
     if (err != ESP_OK) {

@@ -61,7 +61,7 @@ static void wait_for_server(void)
             return; // got an HTTP response of some kind
         }
         printf("waiting for %s...\n",
-               err == ESP_ERR_INVALID_STATE ? "database server (" DB_SERVER_HOSTNAME ") to join Wi-Fi" : "Flask server on port 5000");
+               err == ESP_ERR_INVALID_STATE ? "database server (" DB_SERVER_NAME ") to join Wi-Fi" : "Flask server on port 5000");
         vTaskDelay(pdMS_TO_TICKS(RETRY_PERIOD_MS));
     }
 }

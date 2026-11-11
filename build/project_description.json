@@ -1,7 +1,7 @@
 {
     "version":            "1.3",
     "project_name":       "plateguard_code",
-    "project_version":    "1",
+    "project_version":    "c1b70cb-dirty",
     "project_path":       "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code",
     "idf_path":           "C:/esp/v6.1/esp-idf",
     "build_dir":          "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build",
@@ -1885,7 +1885,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [ "espressif__cjson" ],
             "file": "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/main.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/json_handler.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/test_json_handler.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/test_http.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/wifi_ap.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/client_registry.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/db_client.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/http_server.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/detection_pipeline.c" ],
+            "sources": [ "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/main.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/json_handler.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/test_json_handler.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/test_http.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/wifi_ap.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/client_registry.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/db_client.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/http_server.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/detection_pipeline.c", "C:/Users/danie/OneDrive/Desktop/PlateGuard/plateguard_code/main/web_proxy.c" ],
             "include_dirs": [ "." ]
         },
         "mbedtls": {

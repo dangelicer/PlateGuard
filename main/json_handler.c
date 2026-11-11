@@ -109,6 +109,11 @@ char *build_status_json(int64_t uptime_ms,
             cJSON_AddNullToObject(obj, "ip");
         }
         cJSON_AddStringToObject(obj, "hostname", c->hostname);
+        if (c->name != NULL) {
+            cJSON_AddStringToObject(obj, "name", c->name);
+        } else {
+            cJSON_AddNullToObject(obj, "name");
+        }
         cJSON_AddStringToObject(obj, "role", client_role_name(c->role));
         cJSON_AddItemToArray(client_arr, obj);
     }

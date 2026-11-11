@@ -5,6 +5,7 @@
 #include "includes/wifi_ap.h"
 #include "includes/detection_pipeline.h"
 #include "includes/http_server.h"
+#include "includes/web_proxy.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
@@ -36,6 +37,7 @@ void app_main(void)
 
     ESP_ERROR_CHECK(detection_pipeline_start()); // checks queued detections with the database server
     ESP_ERROR_CHECK(http_server_start());        // receives detections from the Pi
+    ESP_ERROR_CHECK(web_proxy_start());          // serves the dashboard from the database server
 
 #if HTTP_TEST_MODE
     xTaskCreate(http_test_task, "http_test", 8192, NULL, 5, NULL);
