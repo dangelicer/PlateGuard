@@ -1,0 +1,42 @@
+/* PlateGuard dashboard — updated layout */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; color: #222; background: #f4f6f8; }
+header { background: #1f2937; color: white; text-align: center; padding: 20px; }
+header h1 { margin: 0; font-size: 32px; }
+header p { margin: 5px 0 0; }
+main { max-width: 1500px; margin: 30px auto; padding: 0 20px; }
+.status-bar { margin-bottom: 25px; }
+.status-box, .card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,.1); }
+.status-box { padding: 15px; text-align: center; }
+.status-box h3 { margin: 0 0 12px; }
+.status-box p { margin: 0; font-weight: bold; }
+.online { color: #16803a; } .offline { color: #cf3340; } .checking { color: #a56a00; }
+.dashboard-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); gap: 20px; align-items: stretch; }
+.dashboard-left { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.dashboard-right { display: flex; min-width: 0; }
+.card { padding: 25px; min-width: 0; }
+.card h2 { margin-top: 0; }
+.dashboard-left .activity-card, .dashboard-right .alerts-card { flex: 1; }
+.latest { text-align: center; }
+.plate { display: inline-block; background: white; border: 3px solid #222; border-radius: 6px; padding: 10px 30px; margin: 15px; font-size: 30px; font-weight: bold; letter-spacing: 3px; max-width: 100%; overflow-wrap: anywhere; }
+.authorized, .unauthorized { color: white; font-weight: bold; padding: 12px 20px; margin: 10px auto; border-radius: 6px; max-width: 300px; text-align: center; }
+.authorized { background: #28a745; } .unauthorized { background: #cf4049; }
+.card { overflow-x: auto; }
+.card table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.card th, .card td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #e6e8eb; vertical-align: top; }
+.card th { background: #f4f6f8; color: #364152; font-size: 13px; }
+.card tbody tr:nth-child(even) { background: #fafbfc; }
+.card tbody tr:hover { background: #f2f5f8; }
+.green-text { color: #16803a; font-weight: bold; }
+.red-text { color: #cf3340; font-weight: bold; }
+.alerts-card { border-top: 4px solid #cf4049; }
+.alerts-card tbody tr { background: #fff7f7; }
+.alerts-card tbody tr:nth-child(even) { background: #fff1f1; }
+.alerts-card th:first-child, .alerts-card td:first-child { white-space: nowrap; font-weight: bold; }
+.alerts-card th:nth-child(2), .alerts-card td:nth-child(2) { text-align: center; white-space: nowrap; }
+.alerts-card th:nth-child(3) { width: 36%; }
+.alerts-card td:nth-child(3) { overflow-wrap: break-word; }
+.alerts-card th:last-child, .alerts-card td:last-child { min-width: 145px; }
+.activity-card td:first-child { white-space: nowrap; }
+@media (max-width: 1050px) { .dashboard-grid { grid-template-columns: 1fr; } .dashboard-right { display: block; } }
+@media (max-width: 600px) { main { padding: 0 12px; margin: 18px auto; } .card { padding: 15px; } .card table { min-width: 480px; } .plate { font-size: 23px; padding: 10px 15px; } }
